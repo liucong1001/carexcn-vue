@@ -1,0 +1,117 @@
+<template>
+    <div class="exam">
+        <vheader :headermsg="header"></vheader>
+
+        <section class="well" style="padding: 10px 0px 0px 0px;">
+            <div class="panel-heading"  id="merchantDetailFilters" data-auto="true">
+                <div class="form-inline">
+                    <!--<label>冀F</label>-->
+                    <input type="text"  class="plateNum" v-model="carNum" placeholder="车牌号">
+                    <button class="mint-button mint-button--primary mint-button--normal" type="button" v-on:click="search(carNum)"> 查询</button>
+                </div>
+            </div>
+        </section>
+        <section class="well">
+
+            <p class="exam_Title">领导审批表</p>
+            <table width="100%" border="1" cellpadding="0" cellspacing="0" align="center">
+                <tbody>
+                   <tr>
+                       <td>车牌号</td>
+                       <td>旧评估费</td>
+                       <td>新评估费</td>
+                   </tr>
+                    <tr v-for="item in  examList"  @click="goDetail(item)">
+                        <td>{{item.plateNumber}}</td>
+                        <td>{{item.oldEvaluateFees}}</td>
+                        <td>{{item.newEvaluateFees}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </div>
+</template>
+<script>
+    import vheader from './vheader.vue';
+
+    export default {
+        components:{vheader},
+        name:'exam',
+        methods:{
+            load:function () {
+               console.log("开始加载数据ing");
+            },
+            search: function(plateNumber) {
+                console.log("查找到了"+plateNumber);
+
+                this.$http.post("/evaluation/list",{plateNumber:plateNumber}).then(function(result){
+                    console.log("请求查到了"+plateNumber);
+                    this.examList=result.data;
+                },function(response){
+                    console.info(response);
+                })
+            },
+            goDetail:function (item) {
+                 console.log("车牌号："+item.plateNumber);
+                this.$router.push({path:'/examDetail', query: {data: item}});
+            },
+        },
+        data(){
+            return{
+                header:"领导审批",
+                start:'',//開始時間
+                end:'',//結束時間
+                datalist:[],
+                count1:0,
+                count:'',
+                yushenliang:'',
+                yushenliang1:0,
+                money:'',
+                money1:0,
+                ServiceCharge:'',
+                ServiceCharge1:0,
+                examList:"",
+                carNum:"冀F",
+                plateNumber:"",
+                examNum:0
+            }
+
+        },
+        created(){
+        //获取表格数据
+            this.$http.post("/evaluation/list",{}).then(function(result){
+                console.log("请求成功!");
+                console.log(result.data);
+                this.examList=result.data;
+            },function(response){
+                console.info(response);
+            });
+         //获取tip数量
+//            this.getTip();
+
+        },
+
+
+
+    }
+</script>
+<style scoped>
+    .exam{
+        padding: 8px;
+        margin-bottom: 55px;
+    }
+    .exam_Title{
+        font-size: 1.2rem;
+        text-align: center;
+    }
+    .exam table tr td{
+        text-align: center;
+    }
+    .plateNum{
+        outline: none;
+        height: 2rem;
+        /*border: none;*/
+    }
+</style>
+
